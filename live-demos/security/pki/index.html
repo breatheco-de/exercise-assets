@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.boomcdn.com/libs/font-awesome/5.9.0/fontawesome.css">
+</head>
+<body>
+    <script>
+        const encode = function(string, maxBytes = 255){
+            let binaryOutput = '';
+            if (string.length > maxBytes) {
+                string = string.substring(0, maxBytes);
+            }
+
+            for (var i = 0; i < string.length; i++) {
+                binaryOutput += string[i].charCodeAt(0).toString(2) + ' ';
+            }
+
+            return binaryOutput;
+        }
+
+        const decode = function(binary){
+            const arrayOfBytes = binary.split(' ');
+
+            let stringOutput = '';
+
+            for (let i = 0; i < arrayOfBytes.length; i++) {
+                stringOutput += String.fromCharCode(parseInt(arrayOfBytes[i], 2));
+            }
+
+            return stringOutput;
+        }
+        function encrypt(){
+            let private = document.querySelector('#private').value;
+            let public = document.querySelector('#public').value;
+            if(private == "") private = 1;
+            if(public == "") public = 1;
+            let token = parseInt(private) * parseInt(public);
+            
+            
+
+            document.querySelector('#ofuscated').value = token;
+            if(private != 1 && public != 1){
+                const number = parseInt(encode(document.querySelector("#original").value), 2) * parseInt(token.toString(2), 2); // or Buffer.from('hello world')
+                document.querySelector("#encrypted").value = number;
+            }
+        }
+        window.onload = function(){
+            document.querySelectorAll('input').forEach((elm) => elm.addEventListener("keyup", demo));
+        }
+        function dencrypt(){
+            let private = document.querySelector('#private').value;
+            let public = document.querySelector('#public').value;
+            if(private == "") private = 1;
+            if(public == "") public = 1;
+            let token = parseInt(private) * parseInt(public);
+            
+            
+
+            document.querySelector('#ofuscated').value = token;
+            if(private != 1 && public != 1){
+                const number = parseInt(encode(document.querySelector("#original").value), 2) * parseInt(token.toString(2), 2); // or Buffer.from('hello world')
+                document.querySelector("#encrypted").value = number;
+            }
+        }
+        window.onload = function(){
+            document.querySelectorAll('input').forEach((elm) => elm.addEventListener("keyup", demo));
+        }
+    </script>
+    <div class="container">
+        <h1>Hashing Demo</h1>
+        <div class="alert alert-info">Type any value and the corresponding hash will be generated, hashes guarantee that the same original value will always generate the same hash, also, hashes are "impossible" to reverse</div>
+        <div class="row g-3 justify-content-between">
+            <div class="col-3">
+                <input id="private" type="text" class="form-control" placeholder="Type your value" aria-label="City">
+                <div class="form-text">Private</div>
+            </div>
+            <div class="col-1 text-center">
+                ✖️
+            </div>
+            <div class="col-3">
+                <input id="public" type="text" class="form-control" placeholder="Type your value" aria-label="City">
+                <div class="form-text">Seed</div>
+            </div>
+            <div class="col-1 text-center">
+                =
+            </div>
+            <div class="col-4">
+                <input id="ofuscated" type="text" class="form-control" placeholder="Type your value" aria-label="City">
+                <div class="form-text">Public key</div>
+            </div>
+        </div>
+        <div class="row g-3 justify-content-between">
+            <div class="col-6">
+                <textarea id="original" class="form-control">This text will be encripted using the private key</textarea>
+                <div class="form-text">Original Text</div>
+            </div>
+            <div class="col-6">
+                <textarea id="encrypted" class="form-control">This text will be encripted using the private key</textarea>
+                <div class="form-text">Encripted</div>
+            </div>
+        </div>
+        <p>The public key is the only information needed for decripting:</p>
+        <div class="row g-3 justify-content-between mt-5">
+            <div class="col-sm-6">
+                <textarea id="original" class="form-control" placeholder="add your text to decript"></textarea>
+                <div class="form-text">Test to decrypt</div>
+            </div>
+            <div class="col-sm-3">
+                <input id="ofuscated" type="text" class="form-control" placeholder="Type your value" aria-label="City">
+                <div class="form-text">Ofuscated key</div>
+            </div>
+            <div class="col-sm-6">
+                <textarea id="encrypted" class="form-control">This text will be encripted using the private key</textarea>
+                <div class="form-text">Encripted</div>
+            </div>
+        </div>
+        <div class="section">
+    
+        </div>
+    </div>
+</body>
+</html>
