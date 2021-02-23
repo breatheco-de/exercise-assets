@@ -9,113 +9,109 @@
 </head>
 <body>
     <script>
-        const encode = function(string, maxBytes = 255){
-            let binaryOutput = '';
-            if (string.length > maxBytes) {
-                string = string.substring(0, maxBytes);
-            }
-
-            for (var i = 0; i < string.length; i++) {
-                binaryOutput += string[i].charCodeAt(0).toString(2) + ' ';
-            }
-
-            return binaryOutput;
-        }
-
-        const decode = function(binary){
-            const arrayOfBytes = binary.split(' ');
-
-            let stringOutput = '';
-
-            for (let i = 0; i < arrayOfBytes.length; i++) {
-                stringOutput += String.fromCharCode(parseInt(arrayOfBytes[i], 2));
-            }
-
-            return stringOutput;
-        }
         function encrypt(){
-            let private = document.querySelector('#private').value;
-            let public = document.querySelector('#public').value;
-            if(private == "") private = 1;
-            if(public == "") public = 1;
-            let token = parseInt(private) * parseInt(public);
-            
-            
-
-            document.querySelector('#ofuscated').value = token;
-            if(private != 1 && public != 1){
-                const number = parseInt(encode(document.querySelector("#original").value), 2) * parseInt(token.toString(2), 2); // or Buffer.from('hello world')
-                document.querySelector("#encrypted").value = number;
-            }
+            const number = parseInt(document.querySelector("#original").value); // or Buffer.from('hello world')
+            let a = parseInt(document.querySelector('.seed_a').value);
+            let b = parseInt(document.querySelector('.seed_b').value);
+            let encrypted = Math.pow(number, a) % b;
+            document.querySelector("#encrypted").value = encrypted;
         }
         window.onload = function(){
-            document.querySelectorAll('input').forEach((elm) => elm.addEventListener("keyup", demo));
-        }
-        function dencrypt(){
-            let private = document.querySelector('#private').value;
-            let public = document.querySelector('#public').value;
-            if(private == "") private = 1;
-            if(public == "") public = 1;
-            let token = parseInt(private) * parseInt(public);
-            
-            
+            const primes = [[5,14, 11]];
+            // let seed = primes[Math.floor(Math.random() * 1)];
+            document.querySelectorAll('.seed_a').forEach((elm) => elm.value = primes[0][0]);
+            document.querySelectorAll('.seed_b').forEach((elm) => elm.value = primes[0][1]);
+            document.querySelectorAll('.private').forEach((elm) => elm.value = primes[0][2]);
 
-            document.querySelector('#ofuscated').value = token;
-            if(private != 1 && public != 1){
-                const number = parseInt(encode(document.querySelector("#original").value), 2) * parseInt(token.toString(2), 2); // or Buffer.from('hello world')
-                document.querySelector("#encrypted").value = number;
-            }
+            document.querySelectorAll('#encrypt_btn').forEach((elm) => elm.addEventListener("click", encrypt));
+            document.querySelectorAll('#decrypt_btn').forEach((elm) => elm.addEventListener("click", decrypt));
         }
-        window.onload = function(){
-            document.querySelectorAll('input').forEach((elm) => elm.addEventListener("keyup", demo));
+        function decrypt(){
+            let payload = parseInt(document.querySelector('#encrypted').value);
+            let a = parseInt(document.querySelector('.private').value);
+            let b = parseInt(document.querySelector('.seed_b').value);
+            let decrypted = Math.pow(payload, a) % b;
+            document.querySelector("#decrypted").value = decrypted;
         }
     </script>
     <div class="container">
-        <h1>Hashing Demo</h1>
-        <div class="alert alert-info">Type any value and the corresponding hash will be generated, hashes guarantee that the same original value will always generate the same hash, also, hashes are "impossible" to reverse</div>
+        <h1>Oversimplification of the Private Key Infrastructure (PKI)</h1>
+        <div class="alert alert-info">1) Anyone that wants to privately send they bank account number to Alice can use this two numbers A and B below (they are public).</div>
         <div class="row g-3 justify-content-between">
-            <div class="col-3">
-                <input id="private" type="text" class="form-control" placeholder="Type your value" aria-label="City">
-                <div class="form-text">Private</div>
+            <div class="col-12">
+                <div class="input-group">
+                    <span class="input-group-text">Bank account number</span>
+                    <input id="original" class="form-control" value="3490349034" />
+                </div>
+                <div class="form-text">Anything you write here, will be only seen by Alice. It will be converted to a number and then encrypted on the next step. This is the current payload as a number: <span id="payload_number">0</span></div>
+            </div>
+        </div>
+        <div class="alert alert-info mt-4 row">
+            <div class="col-9">
+                2) Anyone sending a <strong>private bank account number</strong> to Alice will use A and B public keys, please press "Encrypt"
+            </div>
+            <div class="col-3 text-right">
+                <button id="encrypt_btn" class="btn btn-success w-100">Encrypt</button>
+            </div>
+        </div>
+        <div class="row g-3 justify-content-between encrypt">
+            <div class="col-2">
+                <div class="input-group">
+                    <span class="input-group-text">A</span>
+                    <input type="text" class="form-control seed_a">
+                </div>
+                <div class="form-text">Seed A (public everyone)</div>
+            </div>
+            <div class="col-3 text-center">
+                <small>Payload number to the power of A <br /> module of B</small>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <span class="input-group-text">B</span>
+                    <input type="text" class="form-control seed_b">
+                </div>
+                <div class="form-text">Seed B (public everyone)</div>
             </div>
             <div class="col-1 text-center">
-                ✖️
-            </div>
-            <div class="col-3">
-                <input id="public" type="text" class="form-control" placeholder="Type your value" aria-label="City">
-                <div class="form-text">Seed</div>
-            </div>
-            <div class="col-1 text-center">
-                =
+                <h1>=</h1>
             </div>
             <div class="col-4">
-                <input id="ofuscated" type="text" class="form-control" placeholder="Type your value" aria-label="City">
-                <div class="form-text">Public key</div>
+                <textarea id="encrypted" class="form-control" placeholder="Original text converted to number and encrypted"></textarea>
+                <div class="form-text">Encrypted payload (converted to number)</div>
             </div>
         </div>
-        <div class="row g-3 justify-content-between">
-            <div class="col-6">
-                <textarea id="original" class="form-control">This text will be encripted using the private key</textarea>
-                <div class="form-text">Original Text</div>
+        <div class="alert alert-info mt-4 row">
+            <div class="col-9">
+                3) Alice receives this message an she is the only one that can decrypt using "C", the private key.
             </div>
-            <div class="col-6">
-                <textarea id="encrypted" class="form-control">This text will be encripted using the private key</textarea>
-                <div class="form-text">Encripted</div>
+            <div class="col-3 text-right">
+                <button id="decrypt_btn" class="btn btn-success w-100">Decrypt</button>
             </div>
         </div>
-        <p>The public key is the only information needed for decripting:</p>
-        <div class="row g-3 justify-content-between mt-5">
-            <div class="col-sm-6">
-                <textarea id="original" class="form-control" placeholder="add your text to decript"></textarea>
-                <div class="form-text">Test to decrypt</div>
+        <div class="row g-3 justify-content-between encrypt">
+            <div class="col-2">
+                <div class="input-group">
+                    <span class="input-group-text">C</span>
+                    <input type="text" class="form-control private">
+                </div>
+                <div class="form-text">Private key (only visible to Alice)</div>
             </div>
-            <div class="col-sm-3">
-                <input id="ofuscated" type="text" class="form-control" placeholder="Type your value" aria-label="City">
-                <div class="form-text">Ofuscated key</div>
+            <div class="col-3 text-center">
+                <small>Encrypted payload to the power of C <br /> module by B</small>
             </div>
-            <div class="col-sm-6">
-                <textarea id="encrypted" class="form-control">This text will be encripted using the private key</textarea>
-                <div class="form-text">Encripted</div>
+            <div class="col-2">
+                <div class="input-group">
+                    <span class="input-group-text">B</span>
+                    <input type="text" class="form-control seed_b">
+                </div>
+                <div class="form-text">Seed B (public everyone)</div>
+            </div>
+            <div class="col-1 text-center">
+                <h1>=</h1>
+            </div>
+            <div class="col-4">
+                <textarea id="decrypted" class="form-control" placeholder="Encrypted text converted to letters and decrypted"></textarea>
+                <div class="form-text">Decrypted payload (converted to letters)</div>
             </div>
         </div>
         <div class="section">
